@@ -1,11 +1,12 @@
-# KARGA_HousekeepingMulti-platform Toolkit for Antibiotic Resistance Identification in Housekeeping Genes from High-Throughput Sequencing Data
+# KARGA_Housekeeping
+Multi-platform Toolkit for Antibiotic Resistance Identification in Housekeeping Genes from High-Throughput Sequencing Data.
 
 
 # Installation
 KARGA_Housekeeping requires the Java Virtual Machine (https://www.java.com/en/). The .class files available on this GitHub have been compiled on MS Windows 10 using 64-bit javac v.15.
 
 # Usage
-- KARGA_Housekeeping is based on k-mer probabilistic matching, similarly to his sibling KARGA ()
+- KARGA_Housekeeping is based on k-mer probabilistic matching, similarly to his sibling KARGA (https://github.com/DataIntellSystLab/KARGA)
 - KARGA_HouseKeeping can be launched from the command line. The minimum input is a read file in (optionally gzipped) FASTQ format, which is automatically detected if the extension is .fastq or .gz. 
 - Without other parameters, our manually curated housekeeping genes database (housekeeping_db.fasta) is used with a default value of k=6. Please download the latest MEGARes release here: (curl) https://megares.meglab.org/download/index.php; https://megares.meglab.org/download/megares_v2.00/megares_full_database_v2.00.fasta.
 - If you wish to classify mobile genetic elements (MGEs), we recommend to enable the multinomial classification option "m:y" which outputs multiple weighted hits. Several MGE reference databases can be used, e.g. ICEBerg (https://db-mml.sjtu.edu.cn/ICEberg/; curl https://db-mml.sjtu.edu.cn/ICEberg2/download/ICE_seq_all.fas).
