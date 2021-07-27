@@ -142,6 +142,7 @@ public class KARGA_HouseKeeping
 		int numT = 12500;
 		String dbfile="housekeeping_db.fasta";
 		String readfile="";
+		boolean reportMultipleHits = true;
 		
 		for (int t=0; t<args.length; t++)
 		{
@@ -150,6 +151,8 @@ public class KARGA_HouseKeeping
 			if (args[t].startsWith("f:")) readfile=args[t].split(":")[1];
 			if (args[t].startsWith("k:")) k=Integer.parseInt(args[t].split(":")[1]);
 			if (args[t].startsWith("i:")) numT=Integer.parseInt(args[t].split(":")[1]);
+			if (args[t].equals("m:n") || args[t].equals("m:no")) reportMultipleHits = false;
+			if (args[t].equals("m:y") || args[t].equals("m:yes")) reportMultipleHits = true;
 		}
 		if (k<4) {System.out.println("Minimum value of k must be 4"); k=4;}
 		if (readfile.equals("")) {System.out.println("Please specify a read file"); System.exit(0);}
@@ -337,8 +340,8 @@ public class KARGA_HouseKeeping
 		BufferedWriter rwriter = new BufferedWriter(rfilewriter);
 		rwriter.write("Idx,");
 		rwriter.write("GeneAnnotation,");
-		rwriter.write("GeneScore/KmerSNPsHits/KmersHitsOnGene/KmersHitsOnAllGenes/KmersTotal,");
-		rwriter.write(",...");
+		rwriter.write("GeneScore/KmerSNPsHits/KmersHitsOnGene/KmersHitsOnAllGenes/KmersTotal");
+		if (reportMultipleHits) rwriter.write(",...");
 		rwriter.write("\r\n");
 		
 		if(readfile.endsWith(".gz"))
@@ -434,10 +437,11 @@ public class KARGA_HouseKeeping
 						float fr = genehitsarr.get(y).getValue();
 						float fp = (float)Math.round(fr*100)/100;
 						rwriter.write(fp+"/"+geneHitsMandatoryUnweightedBest.get(genehitsarr.get(y).getKey())+"/"+geneHitsUnweightedBest.get(genehitsarr.get(y).getKey())+"/"+kmerHitsBest.size()+"/"+(fs[bestMandatory].length()-k+1));
-						if (y>19 || fr/ratio<0.05) {stp=y; break;}
+						if (y>19 || fr/ratio<0.05 || !reportMultipleHits) {stp=y; break;}
 						rwriter.write(",");
 					}
 					rwriter.write("\r\n");
+					if (!reportMultipleHits) {stp=1;}
 					for (int y=0; y<stp; y++)
 					{
 						AMRHousekeepingGene genehit = geneKmerMapping.get(genehitsarr.get(y).getKey());
@@ -455,8 +459,8 @@ public class KARGA_HouseKeeping
 				else
 				{
 					rwriter.write(header+",");
-					rwriter.write("?");
-					rwriter.write("?/?/?/?/?,");
+					rwriter.write("?,");
+					rwriter.write("?/?/?/?/?");
 					rwriter.write("\r\n");
 				}
 			}
