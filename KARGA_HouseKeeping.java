@@ -138,7 +138,7 @@ public class KARGA_HouseKeeping
 		HashMap<String,String> nuc_ami = new HashMap<String,String>();
 		for (int t=0; t<nucleotide_triplets.length; t++) {nuc_ami.put(nucleotide_triplets[t],amino_acids[t]);}
 		
-		int k = 10;
+		int k = 9;
 		int numT = 12500;
 		String dbfile="housekeeping_db.fasta";
 		String readfile="";
