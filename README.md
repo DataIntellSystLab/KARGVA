@@ -1,6 +1,5 @@
 # KARGVA
-K-mer-based Antibiotic Resistance Gene Variant Analyzer (KARGVA)
-KARGVA is a Multi-platform Toolkit for Identification of Antibiotic Resistance from Sequencing Data Conferred by Point Mutations in Bacterial Genes.
+K-mer-based Antibiotic Resistance Gene Variant Analyzer (KARGVA). KARGVA is a Multi-platform Toolkit for Identification of Antibiotic Resistance from Sequencing Data Conferred by Point Mutations in Bacterial Genes.
 
 # Installation
 KARGVA requires the Java Virtual Machine (https://www.java.com/en/). The .class files available on this GitHub have been compiled on MS Windows 10 using 64-bit javac v.15.
