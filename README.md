@@ -1,4 +1,4 @@
-# KARGA_Housekeeping
+# KARGVA
 Multi-platform Toolkit for Antibiotic Resistance Identification in Housekeeping Genes from High-Throughput Sequencing Data.
 
 
