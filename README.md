@@ -15,3 +15,5 @@ The java class accepts the following optional parameters: "k:your_k_value" (posi
 - inputFileName_KARGVA_mappedReads.csv : a CSV file --one line per read-- with the following fields: Read_Idx, GeneAnnotation, GeneScore/KmerSNPsHits/KmersHitsOnGene/KmersHitsOnAllGenes/KmersTotal. Given that antibiotic resistance in housekeeping genes can be due to one or more aminoacidic mutations, in different combinations, we report all the best scoring genes and point mutations present in the database within 5% tolerance ratio compared to the top-scoring hit.
 - inputFileName_KARGVA_mappedGenes.csv : a CSV --one line per ARG-- with the following fields: GeneIdx, PercentGeneCovered, AverageKMerDepth. Note that genes with coverage below 1% are not printed.
 
+# References
+Preprint paper: https://www.biorxiv.org/content/10.1101/2022.08.12.503773v1
