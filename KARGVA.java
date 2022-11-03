@@ -1,3 +1,5 @@
+//v.1.02 Nov 3 2022
+
 import java.io.*;
 import java.io.File;
 import java.lang.*;
@@ -13,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-class AMRVariantGene
+class AMRVariantGene //ARGV-specific class that stores all distinct k-mers of the gene, their multiplicity, the k-mers with resistance SNPs, and it gets updated when reads map to the ARGV
 {
 	public HashMap<String,Integer> kmerFreque;
 	public HashMap<String,Float> kmerMapped;
@@ -26,9 +28,9 @@ class AMRVariantGene
 	}
 }
 
-public class KARGVA
+public class KARGVA //main class of the progam, containing string functions and main algorithms
 {
-	public static String checkAndAmendAminoAcidSequence(String s)
+	public static String checkAndAmendAminoAcidSequence(String s) //check character consistency in an amino acidic string
 	{
 		StringBuffer k = new StringBuffer();
 		for (int i=0; i<s.length(); i++)
@@ -45,7 +47,7 @@ public class KARGVA
 		return k.toString();		
 	}
 	
-	public static String checkAndAmendRead(String s)
+	public static String checkAndAmendRead(String s) //check character consistency in an nucleotide string
 	{
 		StringBuffer k = new StringBuffer();
 		for (int i=0; i<s.length(); i++)
@@ -64,7 +66,7 @@ public class KARGVA
 		return k.toString();		
 	}
 	
-	public static String reverseComplement(String s)
+	public static String reverseComplement(String s) //reverse complement of nucleotide sequence
 	{
 		char[] reverse = new char[s.length()];
 		for (int i=0; i<s.length(); i++) 
@@ -83,7 +85,7 @@ public class KARGVA
 		return String.valueOf(reverse);
 	}
 	
-	public static String nucleotidesToAminoAcids(String s, HashMap<String,String> h)
+	public static String nucleotidesToAminoAcids(String s, HashMap<String,String> h) //translation of nucleotide sequence into amino acids
 	{
 		StringBuffer k = new StringBuffer();
 		for (int i=0; i<s.length()-2; i=i+3)
@@ -95,7 +97,7 @@ public class KARGVA
 		return k.toString();
 	}
 	
-	public static String randomString(int n)
+	public static String randomString(int n) //generation of random nucleotide string of n bases
 	{
 		StringBuffer k = new StringBuffer();
 		for (int i=0; i<n; i++)
@@ -114,7 +116,7 @@ public class KARGVA
 		return k.toString();
 	}
 	
-	public static Comparator<HashMap.Entry<String,Float>> sortHashMapByValueFloat = new Comparator<HashMap.Entry<String,Float>>()
+	public static Comparator<HashMap.Entry<String,Float>> sortHashMapByValueFloat = new Comparator<HashMap.Entry<String,Float>>() //comparator override
 	{
 		@Override
 		public int compare(Map.Entry<String,Float> e1, Map.Entry<String,Float> e2)
@@ -125,8 +127,9 @@ public class KARGVA
 		}
 	};
 	
-	public static void main(String[] args) throws Exception
+	public static void main(String[] args) throws Exception //main program
 	{
+		//setting up timing and memory usage variables
 		long time0 = System.currentTimeMillis();
 		long startTime = System.currentTimeMillis();
 		long endTime = System.currentTimeMillis();
@@ -135,17 +138,20 @@ public class KARGVA
 		float allram = (float)(Runtime.getRuntime().maxMemory());
 		float usedram = (float)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
 		
+		//nucleotide to amino acids translation table
 		String [] nucleotide_triplets ={"AAA","AAC","AAG","AAT","ACA","ACC","ACG","ACT","AGA","AGC","AGG","AGT","ATA","ATC","ATG","ATT","CAA","CAC","CAG","CAT","CCA","CCC","CCG","CCT","CGA","CGC","CGG","CGT","CTA","CTC","CTG","CTT","GAA","GAC","GAG","GAT","GCA","GCC","GCG","GCT","GGA","GGC","GGG","GGT","GTA","GTC","GTG","GTT","TAA","TAC","TAG","TAT","TCA","TCC","TCG","TCT","TGA","TGC","TGG","TGT","TTA","TTC","TTG","TTT"};
 		String [] amino_acids = {"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P","R","R","R","R","L","L","L","L","E","D","E","D","A","A","A","A","G","G","G","G","V","V","V","V","$","Y","$","Y","S","S","S","S","$","C","W","C","L","F","L","F"};
 		HashMap<String,String> nuc_ami = new HashMap<String,String>();
 		for (int t=0; t<nucleotide_triplets.length; t++) {nuc_ami.put(nucleotide_triplets[t],amino_acids[t]);}
 		
-		int k = 9;
-		int numT = 12500;
-		String dbfile="kargva_db_v5.fasta";
+		//default program parameters
+		int k = 9; // k-mer lenght
+		int numT = 12500; //number of iterations of randomized queries
+		String dbfile="kargva_db_v5.fasta"; //default ARGV db
 		String readfile="";
-		boolean reportMultipleHits = true;
+		boolean reportMultipleHits = true; //report more than one ARGV hit (true, false)
 		
+		//reading input files, parameters from command line & printout of help
 		for (int t=0; t<args.length; t++)
 		{
 			if (args[t].startsWith("d:")) dbfile=args[t].split(":")[1];
@@ -155,13 +161,26 @@ public class KARGVA
 			if (args[t].startsWith("i:")) numT=Integer.parseInt(args[t].split(":")[1]);
 			if (args[t].equals("m:n") || args[t].equals("m:no")) reportMultipleHits = false;
 			if (args[t].equals("m:y") || args[t].equals("m:yes")) reportMultipleHits = true;
+			if (args[t].startsWith("-h") || args[t].startsWith("--h"))
+			{
+				System.out.println(" Default execution: java KARGVA readfile.fastq");
+				System.out.println(" Optional parameters:");
+				System.out.println("\t k:your_k_value (positive integer for k-mer length, as aminoacids, default value is 9)");
+				System.out.println("\t d:your_db_fasta (any database of housekeeping genes conferring antibiotic resistance in FASTA format, where the resistance mutations are specified in the header)");
+				System.out.println("\t\t for databases larger than the deafult (kargva_db_v5.fasta), we recommend to use -Xmx16GB or more");
+				System.out.println("\t f:your_reads_fastq (read file in FASTQ format with any file extension)");
+				System.out.println("\t i:your_iterr_value (number of iterations to calculate false positive frequency threshold from a customized count hit distribution of random reads, default is 12,500)");
+				System.out.println("\t m:[y,yes,n,no] (if you want to print the top-scoring ARGV hits for each read, not only the best one, default is yes)");
+				System.exit(0);
+			}
 		}
 		if (k<4) {System.out.println("Minimum value of k must be 4"); k=4;}
 		if (readfile.equals("")) {System.out.println("Please specify a read file"); System.exit(0);}
-		
+		if (numT<10) {numT=10;}
 		System.out.println("Reading antibiotic resistance gene variant database, creating k-mer mapping (k="+k+")");
 		startTime = System.currentTimeMillis();
 		
+		//reading the ARGV database and creating: ARGV classes, k-mer/ARGV hash tables, ARGV/k-mer hash tables
 		HashMap<String,ArrayList<String>> kmerGeneMapping = new HashMap<String,ArrayList<String>>();
 		HashMap<String,ArrayList<String>> kmerGeneSNPMapping = new HashMap<String,ArrayList<String>>();
 		HashMap<String,AMRVariantGene> geneKmerMapping = new HashMap<String,AMRVariantGene>();
@@ -247,7 +266,8 @@ public class KARGVA
 		elapsedTime = endTime - startTime;
 		System.out.println(i+" genes read and k-mers mapped in "+elapsedTime/1000+" seconds");
 		
-		System.out.print("Estimating background/random k-mer match distribution");
+		//estimation of false positive threshold based on average read length and k-mer length
+		System.out.println("Estimating background/random k-mer match distribution");
 		startTime = System.currentTimeMillis();
 		if(readfile.endsWith(".gz"))
 		{
@@ -260,7 +280,7 @@ public class KARGVA
 		i=0;
 		double avg=0f;
 		String line;
-		while((line=r.readLine())!=null || i<numT)
+		while((line=r.readLine())!=null && i<numT)
 		{
 			line=r.readLine();
 			String fwd = line;
@@ -271,15 +291,17 @@ public class KARGVA
 			i++;
 		}
 		avg=avg/(double)(i);
-		System.out.println(" (average read length is "+Math.round(avg)+" bases)");
+		System.out.print("\t"+i+" reads sampled; ");
+		System.out.println("average read length is "+Math.round(avg)+" bases");
 		if ( (avg/3d)<k ) {System.out.println("Average read length too short for the chosen k"); System.exit(0);}
 		int [] matchDist = new int [numT];
 		int [] matchDistNotSNP = new int [numT];
 		System.out.print("\t");
 		for (int y=0; y<numT; y++)
 		{
-			String fk = randomString((int)(avg));
+			String fk = randomString((int)(avg)); //generating random sequences and reverse complements
 			String rk = reverseComplement(fk);
+			//checking hits on ARGV database on all reading frames
 			String f1 = nucleotidesToAminoAcids(fk,nuc_ami); String f2 = nucleotidesToAminoAcids(fk.substring(1),nuc_ami); String f3 = nucleotidesToAminoAcids(fk.substring(2),nuc_ami); 
 			String f4 = nucleotidesToAminoAcids(rk,nuc_ami); String f5 = nucleotidesToAminoAcids(rk.substring(1),nuc_ami); String f6 = nucleotidesToAminoAcids(rk.substring(2),nuc_ami); 
 			matchDist[y] = 0;
@@ -342,11 +364,12 @@ public class KARGVA
 			if (y%(numT/5)==0) System.out.print(y+"..");
 		}
 		System.out.println();
+		//finding the 99th percentile of the count distribution
 		Arrays.sort(matchDist);
 		Arrays.sort(matchDistNotSNP);
 		int pvalthres=matchDist[99*numT/100];
 		int pvalthresNotSNP=matchDistNotSNP[99*numT/100];
-		System.out.println("99th percentile of random variant/gene k-mers match distribution is "+pvalthres+"/"+pvalthresNotSNP+" (max is "+matchDist[numT-1]+"/"+matchDistNotSNP[numT-1]+")");
+		System.out.println("\t99th percentile of random variant/gene k-mers match distribution is "+pvalthres+"/"+pvalthresNotSNP+" (max is "+matchDist[numT-1]+"/"+matchDistNotSNP[numT-1]+")");
 		r.close();
 		endTime = System.currentTimeMillis();
 		elapsedTime = endTime - startTime;
@@ -354,7 +377,7 @@ public class KARGVA
 		
 		System.out.println("Reading file and mapping genes");
 		startTime = System.currentTimeMillis();
-		
+		//parsing and classifying reads from FASTQ file
 		String readOutFile = readfile.substring(0,readfile.indexOf("."))+"_KARGVA_mappedReads.csv";
 		FileWriter rfilewriter = new FileWriter(readOutFile);
 		BufferedWriter rwriter = new BufferedWriter(rfilewriter);
@@ -385,10 +408,12 @@ public class KARGVA
 			fwd = checkAndAmendRead(fwd);
 			if ((fwd.length()/3)>k)
 			{
+				//considering forward-strand, reverse-strand, and all reading frames 
 				String rwd = reverseComplement(fwd);
 				String f1 = nucleotidesToAminoAcids(fwd,nuc_ami); String f2 = nucleotidesToAminoAcids(fwd.substring(1),nuc_ami); String f3 = nucleotidesToAminoAcids(fwd.substring(2),nuc_ami); 
 				String f4 = nucleotidesToAminoAcids(rwd,nuc_ami); String f5 = nucleotidesToAminoAcids(rwd.substring(1),nuc_ami); String f6 = nucleotidesToAminoAcids(rwd.substring(2),nuc_ami); 
 				String [] fs = {f1,f2,f3,f4,f5,f6};
+				//set up of all scoring elements
 				ArrayList<String> kmerHitsMandatoryBest = new ArrayList<String>();
 				ArrayList<String> kmerHitsBest = new ArrayList<String>();
 				HashMap<String,Float> geneHitsMandatoryWeightedBest = new HashMap<String,Float>();
@@ -400,6 +425,7 @@ public class KARGVA
 				int bestMandatory = 0;
 				for (int l=0; l<fs.length; l++)
 				{
+					//evaluating all read configurations
 					ArrayList<String> kmerHitsMandatory = new ArrayList<String>();
 					ArrayList<String> kmerHits = new ArrayList<String>();
 					HashMap<String,Float> geneHitsMandatoryWeighted = new HashMap<String,Float>();
@@ -408,7 +434,9 @@ public class KARGVA
 					HashMap<String,Integer> geneHitsUnweighted = new HashMap<String,Integer>();
 					for (int g=0; g<fs[l].length()-k+1; g++)
 					{
+						//evaluating all k-mers and updating scoring elements
 						String fk = fs[l].substring(g,g+k);
+						//verification and scoring of resistance mutations
 						ArrayList<String> kmerGenesMandatory = kmerGeneSNPMapping.get(fk);
 						if (kmerGenesMandatory!=null)
 						{
@@ -421,6 +449,7 @@ public class KARGVA
 								if (geneHitsMandatoryUnweighted.get(key)==null) {geneHitsMandatoryUnweighted.put(key,1);} else {geneHitsMandatoryUnweighted.put(key,geneHitsMandatoryUnweighted.get(key)+1);}
 							}
 						}
+						//verification and scoring of all k-mer hits
 						ArrayList<String> kmerGenes = kmerGeneMapping.get(fk);
 						if (kmerGenes!=null)
 						{
@@ -437,8 +466,10 @@ public class KARGVA
 					if (kmerHitsMandatory.size()>kmerHitsMandatoryBest.size()) {kmerHitsMandatoryBest=kmerHitsMandatory; geneHitsMandatoryWeightedBest=geneHitsMandatoryWeighted; geneHitsMandatoryUnweightedBest=geneHitsMandatoryUnweighted; bestMandatory=l; kmerHitsBest=kmerHits; geneHitsWeightedBest=geneHitsWeighted; geneHitsUnweightedBest=geneHitsUnweighted;}
 					if (kmerHitsMandatory.size()==0 && kmerHitsNoSNP.size()<kmerHits.size()) {geneHitsNoSNP=geneHitsWeighted; kmerHitsNoSNP=kmerHits;}
 				}
+				//testing for false positives
 				if (kmerHitsMandatoryBest.size()>pvalthres)
 				{
+					//combination of scoring elements into final score
 					HashMap<String,Float> scores = new HashMap<String,Float>();
 					Set<String> geneKeys = geneHitsMandatoryWeightedBest.keySet();
 					for (String gk : geneKeys) 
@@ -465,6 +496,7 @@ public class KARGVA
 						rwriter.write(",");
 					}
 					rwriter.write("\r\n");
+					//scoring and reporting of multiple ARGV hits (if selected in the input by user)
 					if (!reportMultipleHits) {stp=1;}
 					for (int y=0; y<stp; y++)
 					{
@@ -481,12 +513,14 @@ public class KARGVA
 					}
 				}
 				else
+				//flagging false positives on to file
 				{
 					rwriter.write(header+",");
 					rwriter.write("?,");
 					rwriter.write("?/?/?/?/?");
 					rwriter.write("\r\n");
 				}
+				//writing read classifications on to file
 				if (kmerHitsMandatoryBest.size()<=pvalthres && kmerHitsNoSNP.size()>pvalthresNotSNP)
 				{
 					ArrayList<HashMap.Entry<String,Float>> genehitsarr = new ArrayList<HashMap.Entry<String,Float>>();
@@ -518,6 +552,7 @@ public class KARGVA
 			}
 			if (i%100000==0)
 			{
+				//periodic on screen update
 				System.gc();
 				allram = (float)(Runtime.getRuntime().maxMemory());
 				usedram = (float)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());	
@@ -529,14 +564,17 @@ public class KARGVA
 		r.close();
 		rwriter.close();
 
+		//calculating ARGV (gene-specific) summaries and writing on to file
 		FileWriter filewriter = new FileWriter(readfile.substring(0,readfile.indexOf("."))+"_KARGVA_mappedGenes.csv");
 		BufferedWriter writer = new BufferedWriter(filewriter);
 		writer.write("GeneIdx,KmerSNPHits,PercentGeneCovered,AverageKMerDepth\r\n");
 		Collection<String> keysc = geneKmerMapping.keySet();
 		ArrayList<String> keys = new ArrayList<String>(keysc);
 		Collections.sort(keys);
+		//consider each ARGV
 		for (String key : keys)
 		{
+			//update coverage and depth counts
 			AMRVariantGene ag = geneKmerMapping.get(key);
 			Set<String> actualKmers = ag.kmerFreque.keySet();
 			int totKmers = actualKmers.size();
@@ -559,7 +597,7 @@ public class KARGVA
 			kmerSNPHits = kmerSNPHits;
 			percCovered = percCovered/(double)(totKmers);
 			kmerDepth = kmerDepth/(double)(totKmers);
-			if (percCovered>0.001f && kmerSNPHits>0)
+			if (percCovered>0.001f && kmerSNPHits>0) //only ARGV covered at least 1% and with at least one resistance SNP flagged
 			{
 				writer.write(key+",");
 				writer.write((int)(kmerSNPHits)+"/"+(int)(totSNP)+",");
@@ -570,7 +608,7 @@ public class KARGVA
 		writer.close();
 		endTime = System.currentTimeMillis();
 		elapsedTime = endTime - startTime;
-		System.out.print("Reads and genes mapped in = "+elapsedTime/1000+" s\r\n");
+		System.out.print("\t"+i+" reads and genes mapped in = "+elapsedTime/1000+" s\r\n");
 		
 		endTime = System.currentTimeMillis();
 		elapsedTime = endTime - time0;
