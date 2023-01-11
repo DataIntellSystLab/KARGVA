@@ -14,7 +14,30 @@ KARGVA requires the Java Virtual Machine (https://www.java.com/en/). The .class 
 # Output
 - inputFileName_KARGVA_mappedReads.csv : a CSV file --one line per read-- with the following fields: Read_Idx, GeneAnnotation, GeneScore/KmerSNPsHits/KmersHitsOnGene/KmersHitsOnAllGenes/KmersTotal. Given that antibiotic resistance in housekeeping genes can be due to one or more aminoacidic mutations, in different combinations, we report all the best scoring genes and point mutations present in the database within 5% tolerance ratio compared to the top-scoring hit.
 - inputFileName_KARGVA_mappedGenes.csv : a CSV --one line per ARG-- with the following fields: GeneIdx, PercentGeneCovered, AverageKMerDepth. Note that genes with coverage below 1% are not printed.
-- Regarding the output file fields, the mappedGenes.csv file include: GeneIdx - identifier of individual ARGV; PercentGeneCovered - fraction of k-mers over the total number of distinct k-mers in the gene (weighting multiplicity); AverageKMerDepth- average number of times a k-mer is covered. The mappedReads.csv file include: Idx - identifier of individual read; GeneAnnotation - identifier of individual ARGV that the read maps to; GeneScore - score of ARGV mapping reliability; KmerSNPsHits - number of k-mers with resistance SNP found in the mapped ARGV; KmersHitsOnGene - number of k-mers found in the mapped ARGV; KmersHitsOnAllGenes - number of k-mers found in all ARGVs; KmersTotal - total number of k-mers in the read
+- Regarding the output file fields, the mappedGenes.csv file include: GeneIdx - identifier of individual ARGV; PercentGeneCovered - percent of k-mers over the total number of distinct k-mers in the gene (weighting multiplicity); AverageKMerDepth- average number of times a k-mer is covered. The mappedReads.csv file include: Idx - identifier of individual read; GeneAnnotation - identifier of individual ARGV that the read maps to; GeneScore - score of ARGV mapping reliability; KmerSNPsHits - number of k-mers with resistance SNP found in the mapped ARGV; KmersHitsOnGene - number of k-mers found in the mapped ARGV; KmersHitsOnAllGenes - number of k-mers found in all ARGVs; KmersTotal - total number of k-mers in the read
 
 # References
 Preprint paper: https://www.biorxiv.org/content/10.1101/2022.08.12.503773v1
+
+# Tutorial
+Let's start by running KARGVA with options on our example file. To do so, open a terminal, go the directory where you cloned this repository, and run the following:
+
+```java KARGVA k:17 testdata_simul.fastq```
+
+(If you get an error based on the java runtime version, you can recompile KARGVA by running `javac KARGVA.java`.)
+
+This command will run KARGVA on our default fastq file with k-mer length 17. If you have multiple fasta files that should be processed together, such as paired reads R1 and R2 files, you can concatenate them in a single fastq file.
+
+## Mapped genes and reads
+The first output file, `testdata_simul_KARGVA_mappedGenes.csv`, is the per-gene report. Each line of the file indicates a match with a gene. You can check the first lines by running the following: `head testdata_simul_KARGVA_mappedGenes.csv`.
+- `GeneIdx`, is the identifier of individual ARGV, according to the database (header of the fasta match). With the KARGVA database, the `GeneIdx` is splitof into fields separated by `|`. For example: `>1002|V213I|ARO:3003901|Staphylococcus aureus GlpT with mutation conferring ...`. The first field is the KARGVA ARGV index, the second describes the variant at the protein level (wild type 'V' is changed into 'I'), and the others are the descriptors of CARD, MEGARes, and NDARO. Note that "NA" means that there is no corresponding entry for that field in the original database.
+- `KmerSNPHits` is the number of k-mers with resistance SNP found in the mapped ARGV
+- `PercentGeneCovered` is the percent of k-mers over the total number of distinct k-mers in the gene (weighting multiplicity)
+- `AverageKMerDepth` is the average number of times a k-mer is covered
+
+The second output file, `testdata_simul_KARGVA_mappedReads.csv`, is the per-read report. Each line of the file indicates a match with a read. You can check the first lines by running the following: `head testdata_simul_KARGVA_mappedReads.csv`.
+- `Idx` is the read name, according to the fastq
+- `GeneAnnotation` is the description (fasta header) of gene matched by the read. If you are using the KARGVA database, see above for a description of the fields.
+- `GeneScore` is score of ARGV mapping reliability; `KmerSNPsHits` is the number of k-mers with resistance SNP found in the mapped ARGV; `KmersHitsOnGene` is the number of k-mers found in the mapped ARGV; `KmersHitsOnAllGenes` is the number of k-mers found in all ARGVs; and `KmersTotal` is total number of k-mers in the read.
+
+
