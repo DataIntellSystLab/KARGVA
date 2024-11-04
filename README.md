@@ -18,6 +18,7 @@ KARGVA requires the Java Virtual Machine (https://www.java.com/en/). The .class 
 
 # References
 Preprint paper: https://www.biorxiv.org/content/10.1101/2022.08.12.503773v1
+Published paper: https://pubmed.ncbi.nlm.nih.gov/36960290/
 
 # Tutorial
 Let's start by running KARGVA with options on our example file. To do so, open a terminal, go the directory where you cloned this repository, and run the following:
