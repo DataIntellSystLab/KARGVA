@@ -17,8 +17,8 @@ KARGVA requires the Java Virtual Machine (https://www.java.com/en/). The .class 
 - Regarding the output file fields, the mappedGenes.csv file include: GeneIdx - identifier of individual ARGV; PercentGeneCovered - percent of k-mers over the total number of distinct k-mers in the gene (weighting multiplicity); AverageKMerDepth- average number of times a k-mer is covered. The mappedReads.csv file include: Idx - identifier of individual read; GeneAnnotation - identifier of individual ARGV that the read maps to; GeneScore - score of ARGV mapping reliability; KmerSNPsHits - number of k-mers with resistance SNP found in the mapped ARGV; KmersHitsOnGene - number of k-mers found in the mapped ARGV; KmersHitsOnAllGenes - number of k-mers found in all ARGVs; KmersTotal - total number of k-mers in the read
 
 # References
-Preprint paper: https://www.biorxiv.org/content/10.1101/2022.08.12.503773v1
-Published paper: https://pubmed.ncbi.nlm.nih.gov/36960290/
+- Preprint paper: https://www.biorxiv.org/content/10.1101/2022.08.12.503773v1
+- Published paper: https://pubmed.ncbi.nlm.nih.gov/36960290/
 
 # Tutorial
 Let's start by running KARGVA with options on our example file. To do so, open a terminal, go the directory where you cloned this repository, and run the following:
